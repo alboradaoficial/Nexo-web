@@ -1,4 +1,3 @@
-
 "use strict";
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -7,9 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // AÑO AUTOMÁTICO EN EL PIE DE PÁGINA
   // ----------------------------------------
-
   const yearElement = document.getElementById("year");
-
   if (yearElement) {
     yearElement.textContent = new Date().getFullYear();
   }
@@ -17,13 +14,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // MENÚ RESPONSIVE
   // ----------------------------------------
-
   const menuButton = document.querySelector(".menu-toggle");
   const navigation = document.querySelector(".nav");
 
   function closeMenu() {
     if (!menuButton || !navigation) return;
-
     menuButton.setAttribute("aria-expanded", "false");
     menuButton.setAttribute("aria-label", "Abrir menú");
     navigation.classList.remove("is-open");
@@ -32,9 +27,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (menuButton && navigation) {
     menuButton.addEventListener("click", () => {
-      const isOpen =
-        menuButton.getAttribute("aria-expanded") === "true";
-
+      const isOpen = menuButton.getAttribute("aria-expanded") === "true";
       if (isOpen) {
         closeMenu();
       } else {
@@ -61,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // ANIMACIONES AL DESPLAZARSE
   // ----------------------------------------
-
   const revealElements = document.querySelectorAll(".reveal");
 
   if ("IntersectionObserver" in window) {
@@ -92,7 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // SELECCIÓN DE PLANES
   // ----------------------------------------
-
   const planLinks = document.querySelectorAll(".plan-link");
   const detailsField = document.getElementById("detalles");
   const serviceField = document.getElementById("servicio");
@@ -100,11 +91,13 @@ document.addEventListener("DOMContentLoaded", () => {
   planLinks.forEach((link) => {
     link.addEventListener("click", () => {
       const plan = link.dataset.plan || "";
-
       if (detailsField && plan) {
         detailsField.value =
           `Me interesa el plan "${plan}". ` +
           "Quisiera conocer más detalles y confirmar la cotización.";
+      }
+      if (serviceField && plan) {
+        serviceField.value = `Plan: ${plan}`;
       }
     });
   });
@@ -112,17 +105,18 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // PROYECTOS: PRECARGAR EL NOMBRE
   // ----------------------------------------
-
   const projectLinks = document.querySelectorAll("[data-project]");
 
   projectLinks.forEach((link) => {
     link.addEventListener("click", () => {
       const project = link.dataset.project || "";
-
       if (detailsField && project) {
         detailsField.value =
           `Me interesa una página web inspirada en el concepto "${project}". ` +
           "Quisiera conversar sobre una propuesta personalizada.";
+      }
+      if (serviceField && project) {
+        serviceField.value = `Proyecto: ${project}`;
       }
     });
   });
@@ -130,29 +124,19 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // FORMULARIO DE CONTACTO A WHATSAPP
   // ----------------------------------------
-
   const form = document.getElementById("contact-form");
   const status = document.getElementById("form-status");
 
   if (form) {
     form.addEventListener("submit", (event) => {
       event.preventDefault();
-
       if (!form.reportValidity()) return;
 
-      const name =
-        document.getElementById("nombre")?.value.trim() || "";
-
-      const email =
-        document.getElementById("correo")?.value.trim() || "";
-
+      const name = document.getElementById("nombre")?.value.trim() || "";
+      const email = document.getElementById("correo")?.value.trim() || "";
       const service = serviceField?.value || "";
-
-      const budget =
-        document.getElementById("presupuesto")?.value || "Por definir";
-
-      const details =
-        detailsField?.value.trim() || "Sin detalles adicionales";
+      const budget = document.getElementById("presupuesto")?.value || "Por definir";
+      const details = detailsField?.value.trim() || "Sin detalles adicionales";
 
       const message = [
         "Hola, Nexo Studio. Me gustaría consultar sobre un proyecto web.",
@@ -170,8 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
         `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 
       if (status) {
-        status.textContent =
-          "Abriendo WhatsApp con los datos de tu proyecto...";
+        status.textContent = "Abriendo WhatsApp con los datos de tu proyecto...";
       }
 
       const whatsappWindow = window.open(
@@ -180,7 +163,6 @@ document.addEventListener("DOMContentLoaded", () => {
         "noopener,noreferrer"
       );
 
-      // Alternativa si el navegador bloquea la nueva pestaña.
       if (!whatsappWindow) {
         window.location.href = whatsappURL;
       }
@@ -190,9 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ----------------------------------------
   // ENLACE FLOTANTE DE WHATSAPP
   // ----------------------------------------
-
   const whatsappFloat = document.getElementById("whatsapp-float");
-
   if (whatsappFloat) {
     whatsappFloat.href = `https://wa.me/${WHATSAPP_NUMBER}`;
     whatsappFloat.target = "_blank";
