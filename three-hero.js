@@ -1,4 +1,3 @@
-
 import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.module.js";
 
 (() => {
@@ -98,33 +97,23 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
   let targetX = 0;
   let targetY = 0;
 
-  // AJUSTES RESPONSIVOS:
-  // Solo cambian en celular; el computador conserva sus valores originales.
+  // AJUSTES RESPONSIVOS
   function updateResponsiveLayout() {
     const width = container.clientWidth;
     const height = container.clientHeight;
     const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
     if (isMobile) {
-      // Aumenta el tamaño de la figura únicamente en celular.
       sculpture.scale.set(1.3, 1.3, 1.3);
       wireframe.scale.set(1.3, 1.3, 1.3);
-
-      // Desplaza la figura hacia la derecha para que se vea
-      // alrededor de la tarjeta, en lugar de quedar detrás de ella.
       sculpture.position.set(0.55, -0.05, 0);
       wireframe.position.set(0.55, -0.05, 0);
-
-      // Acerca la cámara para evitar el efecto de bolita pequeña.
       camera.position.z = 5.1;
     } else {
-      // Valores originales para escritorio.
       sculpture.scale.set(1, 1, 1);
       wireframe.scale.set(1, 1, 1);
-
       sculpture.position.set(0, 0, 0);
       wireframe.position.set(0, 0, 0);
-
       camera.position.z = 6.0;
     }
 
@@ -132,59 +121,42 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
-
     renderer.setSize(width, height, false);
     render();
   }
 
-  // DIBUJAR LA ESCENA
   function render() {
-    if (!disposed) {
-      renderer.render(scene, camera);
-    }
+    if (!disposed) renderer.render(scene, camera);
   }
 
-  // ADAPTAR LA ESCENA AL TAMAÑO DEL CONTENEDOR
   function resize() {
     if (disposed) return;
     updateResponsiveLayout();
   }
 
-  // DETENER LA ANIMACIÓN
   function stopAnimation() {
     if (frameId !== null) {
       cancelAnimationFrame(frameId);
       frameId = null;
     }
-
     lastTime = 0;
   }
 
-  // ANIMACIÓN PRINCIPAL
   function animate(now) {
     frameId = null;
-
     if (disposed || !isVisible || document.hidden) return;
 
-    const delta = lastTime
-      ? Math.min((now - lastTime) / 1000, 0.05)
-      : 0;
-
+    const delta = lastTime ? Math.min((now - lastTime) / 1000, 0.05) : 0;
     lastTime = now;
     elapsed += delta;
 
     pointerX += (targetX - pointerX) * 0.04;
     pointerY += (targetY - pointerY) * 0.04;
 
-    sculpture.rotation.x =
-      Math.sin(elapsed * 0.45) * 0.17 + pointerY * 0.1;
-
+    sculpture.rotation.x = Math.sin(elapsed * 0.45) * 0.17 + pointerY * 0.1;
     sculpture.rotation.y += delta * 0.22 + pointerX * 0.0015;
+    sculpture.rotation.z = Math.cos(elapsed * 0.3) * 0.1;
 
-    sculpture.rotation.z =
-      Math.cos(elapsed * 0.3) * 0.1;
-
-    // Conserva la posición horizontal configurada para cada pantalla.
     sculpture.position.y =
       (window.matchMedia("(max-width: 768px)").matches ? -0.05 : 0) +
       Math.sin(elapsed * 0.7) * 0.07;
@@ -194,29 +166,16 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     wireframe.position.copy(sculpture.position);
 
     render();
-
     frameId = requestAnimationFrame(animate);
   }
 
-  // INICIAR SOLO CUANDO SEA NECESARIO
   function startAnimation() {
-    if (
-      disposed ||
-      reducedMotion.matches ||
-      !isVisible ||
-      document.hidden ||
-      frameId !== null
-    ) {
-      return;
-    }
-
+    if (disposed || reducedMotion.matches || !isVisible || document.hidden || frameId !== null) return;
     frameId = requestAnimationFrame(animate);
   }
 
-  // RESPETAR LA PREFERENCIA DE MOVIMIENTO
   function updateMotionPreference() {
     stopAnimation();
-
     if (reducedMotion.matches) {
       sculpture.rotation.set(0.12, -0.35, 0);
       wireframe.rotation.copy(sculpture.rotation);
@@ -226,17 +185,11 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     }
   }
 
-  // INTERACCIÓN CON EL PUNTERO
   art.addEventListener("pointermove", (event) => {
     const bounds = art.getBoundingClientRect();
-
     if (!bounds.width || !bounds.height) return;
-
-    targetX =
-      ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-
-    targetY =
-      ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
+    targetX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
+    targetY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
   });
 
   art.addEventListener("pointerleave", () => {
@@ -244,9 +197,7 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     targetY = 0;
   });
 
-  // CAMBIOS DE TAMAÑO
   let resizeObserver;
-
   if ("ResizeObserver" in window) {
     resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(container);
@@ -255,62 +206,40 @@ import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.180.0/build/three.m
     window.addEventListener("resize", resize);
   }
 
-  // PAUSAR CUANDO LA PORTADA NO ESTÁ VISIBLE
   let intersectionObserver;
-
   if ("IntersectionObserver" in window) {
     intersectionObserver = new IntersectionObserver(([entry]) => {
       isVisible = entry.isIntersecting;
-
-      if (isVisible) {
-        startAnimation();
-      } else {
-        stopAnimation();
-      }
+      isVisible ? startAnimation() : stopAnimation();
     });
-
     intersectionObserver.observe(art);
   }
 
-  // PAUSAR CUANDO LA PESTAÑA ESTÁ OCULTA
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) {
-      stopAnimation();
-    } else {
-      startAnimation();
-    }
+    document.hidden ? stopAnimation() : startAnimation();
   });
 
-  // PREFERENCIA DE MOVIMIENTO
   if (typeof reducedMotion.addEventListener === "function") {
     reducedMotion.addEventListener("change", updateMotionPreference);
   }
 
-  // LIBERAR RECURSOS
   function cleanup() {
     if (disposed) return;
-
     disposed = true;
     stopAnimation();
-
     resizeObserver?.disconnect();
     intersectionObserver?.disconnect();
-
     window.removeEventListener("resize", resize);
-
     geometry.dispose();
     material.dispose();
     wireGeometry.dispose();
     wireMaterial.dispose();
-
     renderer.dispose();
   }
 
   window.addEventListener("pagehide", cleanup, { once: true });
 
-  // PRIMER DIBUJO
   resize();
-
   if (reducedMotion.matches) {
     sculpture.rotation.set(0.12, -0.35, 0);
     wireframe.rotation.copy(sculpture.rotation);
